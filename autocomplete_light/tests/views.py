@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import unittest
 import six
 
 try:
@@ -9,11 +8,9 @@ except ImportError:  # python2
     from mock import Mock, MagicMock, patch
 
 from django.utils.encoding import force_text
-from django import forms
-from django import http
 from django.test import RequestFactory
 from django.core.urlresolvers import reverse
-from django.test import Client
+from django.test import Client, TestCase
 try:
     from django.contrib.auth import get_user_model
 except ImportError:
@@ -25,7 +22,7 @@ else:
 import autocomplete_light
 
 
-class RegistryViewTestCase(unittest.TestCase):
+class RegistryViewTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         u = User.objects.create(is_staff=True, username='u', is_active=True)
@@ -84,7 +81,7 @@ class RegistryViewTestCase(unittest.TestCase):
             args=['UserAutocomplete']), force_text(response.content))
 
 
-class AutocompleteViewTestCase(unittest.TestCase):
+class AutocompleteViewTestCase(TestCase):
     def test_404(self):
         c = Client()
         response = c.get(reverse('autocomplete_light_autocomplete',
@@ -118,7 +115,7 @@ class AutocompleteViewTestCase(unittest.TestCase):
         request = RequestFactory().post(
             reverse('autocomplete_light_autocomplete', args=['UserAutocomplete']))
 
-        response = autocomplete_light.AutocompleteView.as_view()(request,
+        autocomplete_light.AutocompleteView.as_view()(request,
             autocomplete='UserAutocomplete')
 
         autocomplete_light.registry.__getitem__.assert_called_with('UserAutocomplete')
@@ -130,7 +127,7 @@ class AutocompleteViewTestCase(unittest.TestCase):
         autocomplete_light.registry = self.old_registry
 
 
-class CreateViewTestCase(unittest.TestCase):
+class CreateViewTestCase(TestCase):
     def test_respond_script(self):
         view = autocomplete_light.CreateView()
         class FakeModel(object):
